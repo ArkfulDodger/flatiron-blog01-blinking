@@ -10,6 +10,6 @@ const yawn2 = "./images/tuba-yawn-2.png";
 const yawn3 = "./images/tuba-yawn-3.png";
 
 // changes DOM image to specified image path
-function changeSpriteTo(imgPath) {
-    tuba.setAttribute('src', imgPath);
-}
+const updateSprite = imgPath => tuba.setAttribute('src', imgPath);
+
+
