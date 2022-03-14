@@ -9,25 +9,112 @@ const yawn1 = "./images/tuba-yawn-1.png";
 const yawn2 = "./images/tuba-yawn-2.png";
 const yawn3 = "./images/tuba-yawn-3.png";
 
-// reference to frame sequences and animations
-const curlAnim = [idle, curl1, curl2, curl1, idle];
+// reference to animation sequences
+const curlAnim = [
+    {
+        sprite: idle,
+        duration: 120,
+    },
+    {
+        sprite: curl1,
+        duration: 120
+    },
+    {
+        sprite: curl2,
+        duration: 300
+    },
+    {
+        sprite: curl1,
+        duration: 120
+    },
+    {
+        sprite: idle,
+        duration: 120
+    }
+]
+const yawnAnim = [
+    {
+        sprite: idle,
+        duration: 75,
+    },
+    {
+        sprite: yawn1,
+        duration: 75
+    },
+    {
+        sprite: yawn2,
+        duration: 75
+    },
+    {
+        sprite: yawn3,
+        duration: 1500
+    },
+    {
+        sprite: yawn2,
+        duration: 75
+    },
+    {
+        sprite: yawn1,
+        duration: 75
+    },
+    {
+        sprite: idle,
+        duration: 75
+    }
+]
 
-// animation variables
-const updateInterval = 0.15;
+// behavior and animation variables
+let behaviorIntervalMin = 1;
+let behaviorIntervalMax = 4;
+let yawnIntervalMin = 2;
+let yawnIntervalMax = 4;
+let nextYawnAt = 5;
+let curlCounter = 1;
 
 // changes DOM image to specified image path
 const updateImage = (imgElement, newImgPath) => imgElement.setAttribute('src', newImgPath);
 
 // play the given animation
-function runAnimation(image, animation) {
-    let frame = 0;
+function runAnimation(image, animation, endBehavior) {
+    let i = 0;
     stepAnimation();
-    const anim = setInterval(stepAnimation, updateInterval * 1000);
 
     function stepAnimation() {
-        updateImage(image, animation[frame]);
-        ++frame >= animation.length ? clearInterval(anim): null;
+        updateImage(image, animation[i].sprite);
+        i < animation.length - 1 ? setTimeout(stepAnimation, animation[i++].duration): endBehavior() || null;
     }
 }
 
-runAnimation(tuba, curlAnim);
+function getNextAnimation() {
+    if (curlCounter > nextYawnAt) {
+        curlCounter = 1;
+        setNextYawnInterval();
+        return yawnAnim;
+    } else {
+        curlCounter++;
+        return curlAnim;
+    }
+}
+
+function getNextBehaviorInterval() {
+    let interval = (Math.random() * (behaviorIntervalMax - behaviorIntervalMin)) + behaviorIntervalMin;
+    console.log('time to next animation: ' + interval);
+    return interval;
+}
+
+function setNextYawnInterval() {
+    nextYawnAt = Math.floor(Math.random() * (yawnIntervalMax - yawnIntervalMin + 1)) + yawnIntervalMin;
+    console.log('curls to next yawn: ' + nextYawnAt);
+}
+
+function runIdleBehavior() {
+    let nextAnimation = getNextAnimation();
+    let interval = getNextBehaviorInterval();
+
+    setTimeout(() => runAnimation(tuba, nextAnimation, runIdleBehavior), interval * 1000);
+}
+
+// initialize first yawn interval
+setNextYawnInterval();
+// run behavior
+runIdleBehavior();
