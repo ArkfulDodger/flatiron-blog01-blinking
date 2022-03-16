@@ -98,7 +98,7 @@ function animateYawn() {
 //#region Behavioral Code Used in Blog
 
 // code governing getting the behavior interval (in milliseconds)
-const behaviorIntMin = 2
+const behaviorIntMin = 1
 const behaviorIntMax = 4
 
 function getRandomBehaviorInterval() {
