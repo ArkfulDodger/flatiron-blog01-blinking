@@ -1,4 +1,4 @@
-//#region Global Variables
+//#region Animation Variables and Functions
 
 // image element in DOM
 const tuba = document.getElementById('tuba');
@@ -12,7 +12,7 @@ const yawn2 = "./images/tuba-yawn-2.png";
 const yawn3 = "./images/tuba-yawn-3.png";
 
 // animation arrays
-const curlAnim = [
+const swishFrames = [
     {
         sprite: idle,
         duration: 120,
@@ -34,7 +34,7 @@ const curlAnim = [
         duration: 120
     }
 ]
-const yawnAnim = [
+const yawnFrames = [
     {
         sprite: idle,
         duration: 75,
@@ -65,76 +65,78 @@ const yawnAnim = [
     }
 ]
 
-// behavior controls
-let behaviorIntervalMin = 1;
-let behaviorIntervalMax = 4;
-let yawnIntervalMin = 2;
-let yawnIntervalMax = 4;
-let nextYawnAt = 5;
-let curlCounter = 1;
-
-
-//#endregion
-
-
-//#region Helper Functions
-
 // changes DOM image to specified image path
 const updateImage = (imgElement, newImgPath) => imgElement.setAttribute('src', newImgPath);
 
-// play the given animation
-const runAnimation = (image, animation, endBehavior) => {
+// animate the given DOM image using the given frames array
+const animate = (domImage, frames) => {
+    console.log('animate called');
     let i = 0;
 
     const stepAnimation = () => {
-        updateImage(image, animation[i].sprite);
-        i < animation.length - 1 ? setTimeout(stepAnimation, animation[i++].duration): endBehavior() || null;
-    }
-    
+        if (i < frames.length) {
+            updateImage(domImage, frames[i].sprite);
+            setTimeout(stepAnimation, frames[i].duration);
+            i++;
+        }
+    };
+
     stepAnimation();
 }
 
-// get next animation to play
-const getNextAnimation = () => {
-    if (curlCounter > nextYawnAt) {
-        curlCounter = 1;
-        setNextYawnInterval();
-        return yawnAnim;
-    } else {
-        curlCounter++;
-        return curlAnim;
-    }
+function animateSwish() {
+    animate(tuba, swishFrames);
 }
 
-// get interval until next behavior will be played/selected
-const getNextBehaviorInterval = () => {
-    let interval = (Math.random() * (behaviorIntervalMax - behaviorIntervalMin)) + behaviorIntervalMin;
-    console.log('time to next animation: ' + interval);
-    return interval * 1000;
-}
-
-// set how many tail curls will pass until the next yawn animation
-const setNextYawnInterval = () => {
-    nextYawnAt = Math.floor(Math.random() * (yawnIntervalMax - yawnIntervalMin + 1)) + yawnIntervalMin;
-}
-
-// call next animation after the determined interval
-const runIdleBehavior = () => {
-    setTimeout(() => runAnimation(tuba, getNextAnimation(), runIdleBehavior), getNextBehaviorInterval());
-}
-
-const init = () => {
-    // initialize first yawn interval
-    setNextYawnInterval();
-    // run idle behavior
-    runIdleBehavior();
+function animateYawn() {
+    animate(tuba, yawnFrames);
 }
 
 //#endregion
 
+//#region Behavioral Code Used in Blog
 
-//#region Code to Run on Page Load
+// code governing getting the behavior interval (in milliseconds)
+const behaviorIntMin = 2
+const behaviorIntMax = 4
 
-init();
+function getRandomBehaviorInterval() {
+    let intervalSeconds = (Math.random() * (behaviorIntMax - behaviorIntMin)) + behaviorIntMin;
+    return intervalSeconds * 1000;
+}
+
+// code governing getting the yawn interval (in loops)
+const yawnIntMin = 2
+const yawnIntMax = 5
+
+function getRandomYawnInterval() {
+    return Math.floor(Math.random() * (yawnIntMax - yawnIntMin + 1)) + yawnIntMin;
+}
+
+// code to call animations
+let count = 1
+let yawnInterval = getRandomYawnInterval()
+
+function runAnimation () {
+    console.log(count);
+    console.log(yawnInterval);
+
+    if (count < yawnInterval) {
+        count++
+        animateSwish()
+    } else {
+        count = 1
+        yawnInterval = getRandomYawnInterval()
+        animateYawn()
+    }
+
+    let behaviorInterval = getRandomBehaviorInterval()
+    console.log(behaviorInterval);
+
+    setTimeout( runAnimation, behaviorInterval)
+}
+
+// invoking our final function
+runAnimation();
 
 //#endregion
