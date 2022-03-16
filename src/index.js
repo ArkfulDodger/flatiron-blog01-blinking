@@ -70,7 +70,6 @@ const updateImage = (imgElement, newImgPath) => imgElement.setAttribute('src', n
 
 // animate the given DOM image using the given frames array
 const animate = (domImage, frames) => {
-    console.log('animate called');
     let i = 0;
 
     const stepAnimation = () => {
@@ -85,10 +84,12 @@ const animate = (domImage, frames) => {
 }
 
 function animateSwish() {
+    console.log('SWISH');
     animate(tuba, swishFrames);
 }
 
 function animateYawn() {
+    console.log('YAWN');
     animate(tuba, yawnFrames);
 }
 
@@ -102,6 +103,7 @@ const behaviorIntMax = 4
 
 function getRandomBehaviorInterval() {
     let intervalSeconds = (Math.random() * (behaviorIntMax - behaviorIntMin)) + behaviorIntMin;
+    console.log('next behavior in:', intervalSeconds, 'seconds');
     return intervalSeconds * 1000;
 }
 
@@ -118,8 +120,9 @@ let count = 1
 let yawnInterval = getRandomYawnInterval()
 
 function runAnimation () {
-    console.log(count);
-    console.log(yawnInterval);
+    console.group('new loop');
+    console.log('count:', count);
+    console.log('yawn at:', yawnInterval);
 
     if (count < yawnInterval) {
         count++
@@ -127,11 +130,12 @@ function runAnimation () {
     } else {
         count = 1
         yawnInterval = getRandomYawnInterval()
+        console.log('yawn updated to:', yawnInterval);
         animateYawn()
     }
 
     let behaviorInterval = getRandomBehaviorInterval()
-    console.log(behaviorInterval);
+    console.groupEnd();
 
     setTimeout( runAnimation, behaviorInterval)
 }
